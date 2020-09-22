@@ -1,0 +1,39 @@
+# DGen/SDL v1.26+
+# Automakefile for mz80
+
+include $(top_srcdir)/Makefile.asm.am
+
+CC_FOR_BUILD=@CC_FOR_BUILD@
+CFLAGS_FOR_BUILD=@CFLAGS_FOR_BUILD@
+OBJEXT_FOR_BUILD=@OBJEXT_FOR_BUILD@
+EXEEXT_FOR_BUILD=@EXEEXT_FOR_BUILD@
+
+AM_CPPFLAGS = -I$(top_srcdir)
+
+MAKEZ80 = makez80$(EXEEXT_FOR_BUILD)
+DIR = $(top_srcdir)/mz80
+
+$(MAKEZ80): $(DIR)/makez80.c
+	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) -o $@ $<
+
+if WITH_X86_MZ80
+BUILT_SOURCES = x86-mz80.asm
+MAKEZ80_ARGS = -l -s -x86
+else
+BUILT_SOURCES = mz80.c
+MAKEZ80_ARGS = -l -s -c
+endif
+
+$(BUILT_SOURCES): $(MAKEZ80)
+	./$(MAKEZ80) $(BUILT_SOURCES) $(MAKEZ80_ARGS)
+
+noinst_LIBRARIES = libmz80.a
+libmz80_a_SOURCES = mz80.h $(BUILT_SOURCES)
+libmz80_a_DEPENDENCIES = $(MAKEZ80)
+EXTRA_libmz80_a_SOURCES = makez80.c
+
+EXTRA_DIST = mz80.txt
+
+DISTCLEANFILES = x86-mz80.asm mz80.c $(MAKEZ80)
+
+.NOTPARALLEL:

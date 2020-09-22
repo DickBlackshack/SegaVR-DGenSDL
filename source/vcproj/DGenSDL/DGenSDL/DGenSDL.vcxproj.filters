@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{56c79c72-edfa-4513-9f93-4c324f509ae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\cyclone">
+      <UniqueIdentifier>{96437e4c-be30-46c9-919e-3a174dbf6cba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\cz80">
+      <UniqueIdentifier>{80208646-8731-4aad-8356-99ed610d2143}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\drz80">
+      <UniqueIdentifier>{7132196e-22c9-4ca3-ade1-8f84f7182f53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\hqx">
+      <UniqueIdentifier>{04f24865-005b-4626-a392-9c5bcb6f1c6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\linenoise">
+      <UniqueIdentifier>{39440b3f-94e9-4d48-8525-20795fe9b1e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\musa">
+      <UniqueIdentifier>{13b3b12c-4228-48b4-988e-09e8d7564104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\mz80">
+      <UniqueIdentifier>{61e4cacb-da14-4f3d-866c-4aa3252b9d29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\scale2x">
+      <UniqueIdentifier>{c5b3d149-e20e-46b4-9e94-8cdc91198ef4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\sdl">
+      <UniqueIdentifier>{d22ed861-9e1f-4f8e-b60f-2ae4cd2f80fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\star">
+      <UniqueIdentifier>{b71bf188-8f0d-4e39-99d0-63b17f31d619}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\segavr">
+      <UniqueIdentifier>{3c8fa4a3-157f-4f85-9b86-56af1ddb145a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\nukedopn2">
+      <UniqueIdentifier>{11ba9fe2-ce6f-4057-aa3e-26b061301751}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\gxz80">
+      <UniqueIdentifier>{4ebca7aa-9d4a-4ddc-a76f-584fe272a42c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\ckvp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\decode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\fm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\graph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\joystick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\md.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mdfr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\myfm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ras.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\rc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\romload.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\save.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sn76496.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\system.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vdp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sdl\font.cpp">
+      <Filter>Components\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sdl\prompt.c">
+      <Filter>Components\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sdl\sdl.cpp">
+      <Filter>Components\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\linenoise\linenoise.c">
+      <Filter>Components\linenoise</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\linenoise\utf8.c">
+      <Filter>Components\linenoise</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sdl\dgenfont_7x5.cpp">
+      <Filter>Components\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sdl\dgenfont_8x13.cpp">
+      <Filter>Components\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\sdl\dgenfont_16x26.cpp">
+      <Filter>Components\sdl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\musa\m68kcpu.c">
+      <Filter>Components\musa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\musa\m68kdasm.c">
+      <Filter>Components\musa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\musa\m68kops.c">
+      <Filter>Components\musa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\cz80\cz80.c">
+      <Filter>Components\cz80</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\segavr\md_vr.cpp">
+      <Filter>Components\segavr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\star\cpudebug.c">
+      <Filter>Components\star</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\nukedopn2\ym3438.c">
+      <Filter>Components\nukedopn2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mz80\mz80.c">
+      <Filter>Components\mz80</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gxz80\z80.c">
+      <Filter>Components\gxz80</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\ckvp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\decode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\md.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\memcpy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\pd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ras-drawplane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\rc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\rc-vars.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\romload.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sn76496.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\font.h">
+      <Filter>Components\sdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\ogl_fonts.h">
+      <Filter>Components\sdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\pd-defs.h">
+      <Filter>Components\sdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\prompt.h">
+      <Filter>Components\sdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\splash.h">
+      <Filter>Components\sdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\linenoise\linenoise.h">
+      <Filter>Components\linenoise</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\linenoise\utf8.h">
+      <Filter>Components\linenoise</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\dgenfont_7x5.h">
+      <Filter>Components\sdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\dgenfont_8x13.h">
+      <Filter>Components\sdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdl\dgenfont_16x26.h">
+      <Filter>Components\sdl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\musa\m68k.h">
+      <Filter>Components\musa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\musa\m68kconf.h">
+      <Filter>Components\musa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\musa\m68kcpu.h">
+      <Filter>Components\musa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\musa\m68kops.h">
+      <Filter>Components\musa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\cz80\cz80.h">
+      <Filter>Components\cz80</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\star\cpudebug.h">
+      <Filter>Components\star</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\star\starcpu.h">
+      <Filter>Components\star</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\nukedopn2\ym3438.h">
+      <Filter>Components\nukedopn2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mz80\mz80.h">
+      <Filter>Components\mz80</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gxz80\osd_cpu.h">
+      <Filter>Components\gxz80</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gxz80\z80.h">
+      <Filter>Components\gxz80</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\cz80\cz80.inc">
+      <Filter>Components\cz80</Filter>
+    </None>
+    <None Include="..\..\..\cz80\cz80_op.inc">
+      <Filter>Components\cz80</Filter>
+    </None>
+    <None Include="..\..\..\cz80\cz80_opcb.inc">
+      <Filter>Components\cz80</Filter>
+    </None>
+    <None Include="..\..\..\cz80\cz80_oped.inc">
+      <Filter>Components\cz80</Filter>
+    </None>
+    <None Include="..\..\..\cz80\cz80_opxy.inc">
+      <Filter>Components\cz80</Filter>
+    </None>
+    <None Include="..\..\..\cz80\cz80_opxycb.inc">
+      <Filter>Components\cz80</Filter>
+    </None>
+    <None Include="..\..\..\cz80\cz80exec.inc">
+      <Filter>Components\cz80</Filter>
+    </None>
+    <None Include="..\..\..\cz80\cz80jmp.inc">
+      <Filter>Components\cz80</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DGenSDL.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\segavr_ico.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\star\starcpu.asm">
+      <Filter>Components\star</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

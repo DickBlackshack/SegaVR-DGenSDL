@@ -1,0 +1,6 @@
+# Tell how to make assembler files
+
+SUFFIXES = .asm
+
+.asm.$(OBJEXT):
+	@NASM@ -f @NASM_FORMAT@ -o $@ -- $<
