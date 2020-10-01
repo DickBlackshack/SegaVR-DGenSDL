@@ -36,7 +36,6 @@ bool md::openvr_init()
 		return false;
 	}
 	
-	//todo - expose in config
 	const float idealAspect = (float)dgen_openvr_idealaspect_width / dgen_openvr_idealaspect_height;
 	const float imagePerspectiveScale = (float)dgen_openvr_imgpscale / 65536.0f;
 
