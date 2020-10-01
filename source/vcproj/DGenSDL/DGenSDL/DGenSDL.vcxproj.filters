@@ -55,6 +55,9 @@
     <Filter Include="Components\gxz80">
       <UniqueIdentifier>{4ebca7aa-9d4a-4ddc-a76f-584fe272a42c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components\openvr">
+      <UniqueIdentifier>{4ea1a3ff-a75b-4d23-b023-114c0ecb8a6f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\ckvp.c">
@@ -161,6 +164,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\gxz80\z80.c">
       <Filter>Components\gxz80</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\openvr\md_openvr.cpp">
+      <Filter>Components\openvr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -274,6 +280,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\gxz80\z80.h">
       <Filter>Components\gxz80</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\openvr\openvr_interface.h">
+      <Filter>Components\openvr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

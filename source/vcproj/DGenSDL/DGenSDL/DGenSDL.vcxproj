@@ -31,6 +31,7 @@
     <ClCompile Include="..\..\..\myfm.cpp" />
     <ClCompile Include="..\..\..\mz80\mz80.c" />
     <ClCompile Include="..\..\..\nukedopn2\ym3438.c" />
+    <ClCompile Include="..\..\..\openvr\md_openvr.cpp" />
     <ClCompile Include="..\..\..\ras.cpp" />
     <ClCompile Include="..\..\..\rc.cpp" />
     <ClCompile Include="..\..\..\romload.c" />
@@ -66,6 +67,7 @@
     <ClInclude Include="..\..\..\musa\m68kops.h" />
     <ClInclude Include="..\..\..\mz80\mz80.h" />
     <ClInclude Include="..\..\..\nukedopn2\ym3438.h" />
+    <ClInclude Include="..\..\..\openvr\openvr_interface.h" />
     <ClInclude Include="..\..\..\pd.h" />
     <ClInclude Include="..\..\..\platform.h" />
     <ClInclude Include="..\..\..\ras-drawplane.h" />
@@ -153,7 +155,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WITH_SEGAVR;WITH_MUSA;WITH_STAR;WITH_CZ80;WITH_MZ80;WITH_GXZ80;WITH_DEBUGGER;WITH_JOYSTICK;WITH_PICO;WITH_OPENGL;WITH_NUKEDOPN2;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WITH_SEGAVR;WITH_OPENVR;WITH_MUSA;WITH_STAR;WITH_CZ80;WITH_MZ80;WITH_GXZ80;WITH_DEBUGGER;WITH_JOYSTICK;WITH_PICO;WITH_OPENGL;WITH_NUKEDOPN2;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../..;../../../sdl;../../../sdl/SDL-1.2.15/include</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
@@ -171,7 +173,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WITH_SEGAVR;WITH_MUSA;WITH_STAR;WITH_CZ80;WITH_MZ80;WITH_GXZ80;WITH_DEBUGGER;WITH_JOYSTICK;WITH_PICO;WITH_OPENGL;WITH_NUKEDOPN2;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WITH_SEGAVR;WITH_OPENVR;WITH_MUSA;WITH_STAR;WITH_CZ80;WITH_MZ80;WITH_GXZ80;WITH_DEBUGGER;WITH_JOYSTICK;WITH_PICO;WITH_OPENGL;WITH_NUKEDOPN2;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../..;../../../sdl;../../../sdl/SDL-1.2.15/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

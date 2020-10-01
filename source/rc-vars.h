@@ -167,10 +167,11 @@ RCVAR(dgen_vdp_sprites_boxing_fg, 0xffff00); // yellow
 RCVAR(dgen_vdp_sprites_boxing_bg, 0x00ff00); // green
 RCVAR(dgen_ym_lowpass_cutoff, 0);
 RCVAR(dgen_enable_bankswitch, 1);
+RCVAR(dgen_h32_stretch, 0);
 
 #define YM_CHIPIMPL_DEFAULT 0
 #define YM_CHIPIMPL_NUKEDOPN2 1
-RCVAR(dgen_ym_chipimpl, YM_CHIPIMPL_NUKEDOPN2);
+RCVAR(dgen_ym_chipimpl, YM_CHIPIMPL_DEFAULT);
 
 #ifdef WITH_SEGAVR
 RCVAR(dgen_segavr_enabled, 1);
@@ -202,6 +203,16 @@ RCCTL(segavr_hmd_pitch_down, ',', JS_AXIS(0, 3, JS_AXIS_POSITIVE), 0);
 RCCTL(segavr_hmd_yaw_left, ',', JS_AXIS(0, 4, JS_AXIS_NEGATIVE), 0);
 RCCTL(segavr_hmd_yaw_right, ',', JS_AXIS(0, 4, JS_AXIS_POSITIVE), 0);
 RCCTL(segavr_hmd_quadshot, PDK_F4, 0, 0);
+#endif
+#ifdef WITH_OPENVR
+RCVAR(dgen_openvr_enabled, 1);
+RCVAR(dgen_openvr_swapinterval, 0);
+RCVAR(dgen_openvr_eyewidth, 0);
+RCVAR(dgen_openvr_eyeheight, 0);
+RCVAR(dgen_openvr_imgpscale, 32768);
+RCVAR(dgen_openvr_idealaspect_width, 320);
+RCVAR(dgen_openvr_idealaspect_height, 240);
+RCVAR(dgen_openvr_eyes_sync, 1);
 #endif
 
 // Keep values in sync with rc.cpp and enums in md.h

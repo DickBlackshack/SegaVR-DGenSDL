@@ -760,7 +760,8 @@ struct rc_field rc_fields[RC_FIELDS_SIZE] = {
 	{ "bool_vdp_sprites_boxing", rc_boolean, &dgen_vdp_sprites_boxing },
 	{ "int_vdp_sprites_boxing_fg", rc_number, &dgen_vdp_sprites_boxing_fg },
 	{ "int_vdp_sprites_boxing_bg", rc_number, &dgen_vdp_sprites_boxing_bg },
-	{ "bool_enable_bankswitch", rc_number, &dgen_enable_bankswitch },
+	{ "bool_enable_bankswitch", rc_boolean, &dgen_enable_bankswitch },
+	{ "int_h32_stretch", rc_number, &dgen_h32_stretch },
 	{ "int_ym_lowpass_cutoff", rc_number, &dgen_ym_lowpass_cutoff },
 	{ "int_ym_chipimpl", rc_number, &dgen_ym_chipimpl },
 #ifdef WITH_SEGAVR
@@ -803,6 +804,16 @@ struct rc_field rc_fields[RC_FIELDS_SIZE] = {
 	{ "key_hmd_quadshot", rc_keysym, &segavr_hmd_quadshot[RCBK] },
 	{ "joy_hmd_quadshot", rc_joypad, &segavr_hmd_quadshot[RCBJ] },
 	{ "mou_hmd_quadshot", rc_mouse, &segavr_hmd_quadshot[RCBM] },
+#endif
+#ifdef WITH_OPENVR
+	{ "bool_openvr_enabled", rc_boolean, &dgen_openvr_enabled },
+	{ "int_openvr_swapinterval", rc_number, &dgen_openvr_swapinterval },
+	{ "int_openvr_eyewidth", rc_number, &dgen_openvr_eyewidth },
+	{ "int_openvr_eyeheight", rc_number, &dgen_openvr_eyeheight },
+	{ "int_openvr_imgpscale", rc_number, &dgen_openvr_imgpscale },
+	{ "int_openvr_idealaspect_width", rc_number, &dgen_openvr_idealaspect_width },
+	{ "int_openvr_idealaspect_height", rc_number, &dgen_openvr_idealaspect_height },
+	{ "bool_openvr_eyes_sync", rc_boolean, &dgen_openvr_eyes_sync },
 #endif
 	{ "bool_autoload", rc_boolean, &dgen_autoload },
 	{ "bool_autosave", rc_boolean, &dgen_autosave },

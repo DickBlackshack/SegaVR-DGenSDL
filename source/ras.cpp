@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
+#include <math.h>
 #include "system.h"
 #include "md.h"
 #include "pd.h"
@@ -1248,6 +1249,29 @@ void md_vdp::draw_plane_front1(int line)
 #define vdp_hide_if(a, b) (void)(b)
 #endif
 
+static uint32_t remap_base_pal_rgba32(uint8_t *pCram)
+{
+	//remap to a slightly more believable (and accurate) palette
+	static const uint8_t skLut[8] =
+	{
+		0, 49, 87, 119, 146, 174, 206, 255
+	};
+	const uint16_t clr = (pCram[0] << 8) | pCram[1];
+	const uint16_t r = (clr >> 1) & 7;
+	const uint16_t g = (clr >> 5) & 7;
+	const uint16_t b = (clr >> 9) & 7;
+	return skLut[b] | (skLut[g] << 8) | (skLut[r] << 16);
+}
+
+static uint32_t lerp_rgba32(const uint32_t a, const uint32_t b, const float frac)
+{
+	const float invFrac = 1.0f - frac;
+	uint32_t c0 = (uint32_t)((float)(a & 0xFF) * invFrac + (float)(b & 0xFF) * frac);
+	uint32_t c1 = (uint32_t)((float)((a >> 8) & 0xFF) * invFrac + (float)((b >> 8) & 0xFF) * frac);
+	uint32_t c2 = (uint32_t)((float)((a >> 16) & 0xFF) * invFrac + (float)((b >> 16) & 0xFF) * frac);
+	return c0 | (c1 << 8) | (c2 << 16);
+}
+
 // The main interface function, to generate a scanline
 void md_vdp::draw_scanline(struct bmap *bits, int line)
 {
@@ -1291,9 +1315,15 @@ void md_vdp::draw_scanline(struct bmap *bits, int line)
 #endif
 	case 32:
 	  for(i = 0; i < 128; i += 2)
+	  {
+#if 0
 	    *ptr++ = ((cram[i+1]&0x0e) << 20) |
 		     ((cram[i+1]&0xe0) << 8 ) |
 		     ((cram[i]  &0x0e) << 4 );
+#else
+		*ptr++ = remap_base_pal_rgba32(cram + i);
+#endif
+	  }
 	  break;
 	case 16:
 	  for(i = 0; i < 128; i += 2)
@@ -1372,11 +1402,48 @@ void md_vdp::draw_scanline(struct bmap *bits, int line)
 
   // If we're in narrow (256) mode, cut off the messy edges
   if(!(reg[12] & 1))
-    {
+  {
       unsigned *destl = (unsigned*)dest;
       for(i = 0; i < Bpp_times8; ++i)
         destl[i] = destl[i + (72 * Bpp)] = 0;
-    }
+
+	  if (Bpp == 4 && dgen_h32_stretch)
+	  {
+		  //possible todo - could offer a more accurate step function, haven't read on what the signal is actually doing in this mode
+		  //could also make very speedy with a lut
+		  static uint32_t sTempLine[256];
+		  memcpy(sTempLine, destl + 32, sizeof(sTempLine));
+		  const float step = 1.0f / 320.0f;
+		  float currentStep = 0.0f;
+		  if (dgen_h32_stretch == 2)
+		  { //linear
+			  for (uint32_t offset = 0; offset < 320; ++offset)
+			  {
+				  const float f = currentStep * 256.0f;
+				  const int srcIndex = (int)f;
+				  const float frac = f - srcIndex;
+				  if (frac > 0.0f && srcIndex < 255)
+				  {
+					  destl[offset] = lerp_rgba32(sTempLine[srcIndex], sTempLine[srcIndex + 1], frac);
+				  }
+				  else
+				  {
+					  destl[offset] = sTempLine[srcIndex];
+				  }
+				  currentStep += step;
+			  }
+		  }
+		  else
+		  {
+			  for (uint32_t offset = 0; offset < 320; ++offset)
+			  {
+				  const int srcIndex = (int)(currentStep * 256);
+				  destl[offset] = sTempLine[srcIndex];
+				  currentStep += step;
+			  }
+		  }
+	  }
+  }
 }
 
 void md_vdp::draw_pixel(struct bmap *bits, int x, int y, uint32_t rgb)

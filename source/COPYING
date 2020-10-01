@@ -61,3 +61,6 @@ described in drz80/DrZ80.txt.
 
 The contents of the dz80/ directory are copyright Mark Incley, under a licence
 described in dz80/README.TXT.
+
+The contents of the openvr/openvr/ directory are copyright Valve Corporation, under a licence
+described in openvr/openvr/LICENSE.

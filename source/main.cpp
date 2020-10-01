@@ -653,10 +653,20 @@ next_rom:
 				if (tmp > (1000000 / 50))
 					tmp = (1000000 / 50);
 				tmp -= 1000;
+
+				//keep updating eyes around the throttling to keep tracking "smooth", even though we're just reusing the same eye frames
+#ifdef WITH_OPENVR
+				megad->openvr_get_poses();
+#endif
+
 #ifdef __BEOS__
 				snooze(tmp / 1000);
 #else
 				usleep(tmp);
+#endif
+
+#ifdef WITH_OPENVR
+				megad->openvr_submit_eyes();
 #endif
 			}
 		}
@@ -666,7 +676,7 @@ next_rom:
 				goto frozen;
 
 			// Draw frames.
-			while (frames_todo != 1) {
+			while (frames_todo > 1) {
 				do_demo(*megad, file, &demo_status);
 				if (dgen_sound) {
 					// Skip this frame, keep sound going.
@@ -680,6 +690,9 @@ next_rom:
 			}
 			--frames_todo;
 		do_not_skip:
+#ifdef WITH_OPENVR
+			megad->openvr_get_poses();
+#endif
 			do_demo(*megad, file, &demo_status);
 			if (dgen_sound) {
 				megad->one_frame(&mdscr, mdpal, &sndi);
@@ -692,14 +705,33 @@ next_rom:
 				pd_graphics_palette_update();
 				pal_dirty = 0;
 			}
-#ifdef WITH_SEGAVR
-			if (!megad->segavr_steal_frame(&mdscr))
-			{
+
+#ifdef WITH_OPENVR
+			megad->spCurrentOVRI = megad->mpOVRI;
 #endif
+
+#ifdef WITH_SEGAVR
+			const bool frameStolen = megad->segavr_steal_frame(&mdscr);
+#endif
+
+#ifdef WITH_OPENVR
+			megad->openvr_submit_eyes();
+#endif
+
+#ifdef WITH_SEGAVR
+			if (!frameStolen)
+#endif
+			{
+
 				pd_graphics_update(megad->plugged);
 #ifdef WITH_SEGAVR
 			}
 #endif
+
+#ifdef WITH_OPENVR
+			megad->spCurrentOVRI = NULL;
+#endif
+
 			++frames;
 		}
 

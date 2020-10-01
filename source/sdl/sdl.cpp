@@ -61,6 +61,10 @@ extern "C" {
 }
 #endif
 
+#if WITH_OPENVR
+#include "openvr/openvr_interface.h"
+#endif
+
 /// Number of microseconds to sustain messages
 #define MESSAGE_LIFE 3000000
 
@@ -166,6 +170,13 @@ void pd_set_swap_interval(int32_t ivl)
 }
 #endif
 
+#ifdef WITH_OPENVR
+bool pd_screen_is_opengl()
+{
+	return screen.is_opengl;
+}
+#endif
+
 /**
  * Call this before accessing screen.buf.
  * No syscalls allowed before screen_unlock().
@@ -215,6 +226,14 @@ static void screen_update_once()
 #ifdef WITH_OPENGL
 	if (screen.is_opengl) {
 		update_texture(screen.texture);
+
+#if WITH_OPENVR
+		//openvr implementation also assumes opengl
+		if (md::spCurrentOVRI)
+		{
+			md::spCurrentOVRI->OVR_PostSwapBuffers();
+		}
+#endif
 		return;
 	}
 #endif
@@ -1103,6 +1122,13 @@ static const struct filter *filters_find(const char *name)
 		if (!strcasecmp(name, filters_available[i].name))
 			return &filters_available[i];
 	return NULL;
+}
+
+uint8_t *pd_screen_filter_ptr(struct bmap &scr, uint32_t &width, uint32_t &height)
+{
+	width = video.width;
+	height = video.height;
+	return ((uint8_t *)scr.data + (scr.pitch * 8) + 16);
 }
 
 /**

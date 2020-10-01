@@ -13,6 +13,8 @@
 // Return the number of microseconds elapsed since an unspecified time.
 unsigned long pd_usecs(void);
 
+uint8_t *pd_screen_filter_ptr(struct bmap &scr, uint32_t &width, uint32_t &height);
+
 //rww - exposed to auto-generate a series of stereo shots
 void pd_do_screenshot(md& megad, const char *pNameSuffix, const bool autoIncrementShotNumber);
 
@@ -25,6 +27,9 @@ extern struct bmap mdscr;
 extern unsigned char *mdpal;
 #ifdef WITH_SEGAVR
 void pd_set_swap_interval(int32_t ivl);
+#endif
+#ifdef WITH_OPENVR
+bool pd_screen_is_opengl();
 #endif
 // Initialize graphics, in NTSC (320x224) or PAL (320x240) mode.
 // Since many interfaces require that DGen be setuid-root, this should also

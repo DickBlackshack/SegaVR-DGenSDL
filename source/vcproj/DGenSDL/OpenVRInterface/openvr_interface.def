@@ -1,0 +1,4 @@
+LIBRARY
+
+EXPORTS
+   OpenVR_Interface_Init

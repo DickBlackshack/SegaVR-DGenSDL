@@ -137,6 +137,10 @@ struct sndinfo {
 
 int get_md_palette(unsigned char pal[256],unsigned char *cram);
 
+#ifdef WITH_OPENVR
+struct SOVRInterface;
+#endif
+
 class md;
 class md_vdp
 {
@@ -836,6 +840,7 @@ public:
   bool segavr_allow_frameskip();
   bool segavr_steal_frame(bmap *pFrame);
   void segavr_set_hmd_movement(const uint32_t axis, const float amount);
+  void segavr_update_hmd_angles(const float *pAngleOverride);
   void segavr_apply_hmd_movement();
   bool segavr_catch_io_write(uint32_t a, uint8_t d);
   bool segavr_catch_io_read(uint8_t &valueOut, uint32_t a);
@@ -855,6 +860,17 @@ public:
   bmap *mpEyeMap;
   float *mpLightnessTable;
   bool *mpLightnessTableEntryCalculated;
+#endif
+
+#ifdef WITH_OPENVR
+  //sorry non-Windows folks!
+  HMODULE mOpenVRLib;
+  SOVRInterface *mpOVRI;
+  static SOVRInterface *spCurrentOVRI;
+  bool openvr_init();
+  void openvr_cleanup();
+  void openvr_get_poses();
+  bool openvr_submit_eyes();
 #endif
 };
 

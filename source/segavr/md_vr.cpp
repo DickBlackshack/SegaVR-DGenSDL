@@ -6,6 +6,9 @@
 #include "mem.h"
 #include "rc-vars.h"
 #include "pd.h"
+#ifdef WITH_OPENVR
+#include "openvr/openvr_interface.h"
+#endif
 #include <algorithm>
 
 namespace
@@ -60,6 +63,15 @@ namespace
 		return lStar / 100.0f * 255.0f;
 	}
 #endif
+
+#ifdef WITH_OPENVR
+	INLINE void ovri_update_eye_image(SOVRInterface *pOVRI, bool isLeft, struct bmap *pFrame)
+	{
+		uint32_t width, height;
+		uint8_t *pData = pd_screen_filter_ptr(*pFrame, width, height);
+		pOVRI->OVR_ProvideEyeImage(isLeft, pData, pFrame->bpp, width, height, pFrame->pitch);
+	}
+#endif
 }
 
 void md::segavr_init()
@@ -110,6 +122,13 @@ void md::segavr_begin_scan()
 
 bool md::segavr_allow_frameskip()
 {
+#ifdef WITH_OPENVR
+	if (mpOVRI)
+	{
+		return true;
+	}
+#endif
+
 	//don't allow frameskip when active, we're tracking and combing frames
 	return !mHmdIsActive;
 }
@@ -118,6 +137,14 @@ bool md::segavr_steal_frame(bmap *pFrame)
 {
 	if (!dgen_segavr_enabled)
 	{
+#ifdef WITH_OPENVR
+		if (mpOVRI)
+		{
+			//if sega vr is disabled but the headset is enabled, just provide the same image for both eyes
+			ovri_update_eye_image(mpOVRI, true, pFrame);
+			ovri_update_eye_image(mpOVRI, false, pFrame);
+		}
+#endif
 		return false;
 	}
 
@@ -147,14 +174,37 @@ bool md::segavr_steal_frame(bmap *pFrame)
 		}
 	}
 
+#ifdef WITH_OPENVR
+	if (mpOVRI)
+	{
+		ovri_update_eye_image(mpOVRI, isLeft, pFrame);
+		if (!mHmdIsActive)
+		{
+			//provide the same image for the other eye if the HMD isn't active
+			ovri_update_eye_image(mpOVRI, !isLeft, pFrame);
+		}
+
+		//override the angles with the latest from the real headset
+		float pitchYaw[2];
+		mpOVRI->OVR_GetHMDPitchYaw(pitchYaw);
+		segavr_update_hmd_angles(pitchYaw);
+	}
+#endif
+
 	//only support processing raw rgb(a)
 	const bool frameStealingEnabled = (mHmdIsActive && pFrame->bpp >= 24 && dgen_segavr_displaymode);
 
-	if (dgen_segavr_swapinterval != 0)
+#ifdef WITH_OPENVR
+	const int32_t desiredSwapValue = (mpOVRI) ? dgen_openvr_swapinterval : dgen_segavr_swapinterval;
+#else
+	const int32_t desiredSwapValue = dgen_segavr_swapinterval;
+#endif
+
+	if (desiredSwapValue != 0)
 	{
 		//try to adjust swap interval dynamically depending on whether frame stealing is enabled
-		const int32_t ivl = (dgen_segavr_swapinterval > 0) ? dgen_segavr_swapinterval :
-		                                                     frameStealingEnabled ? 2 : 1;
+		const int32_t ivl = (desiredSwapValue > 0) ? desiredSwapValue :
+		                                             frameStealingEnabled ? 2 : 1;
 		pd_set_swap_interval(ivl);
 	}
 
@@ -243,15 +293,13 @@ void md::segavr_set_hmd_movement(const uint32_t axis, const float amount)
 	mHmdAVel[axis] = amount;
 }
 
-void md::segavr_apply_hmd_movement()
+void md::segavr_update_hmd_angles(const float *pAngleOverride)
 {
-	if (mHmdAVel[0] == 0.0f && mHmdAVel[1] == 0.0f)
+	if (pAngleOverride)
 	{
-		return;
+		mHmdAngles[0] = pAngleOverride[0];
+		mHmdAngles[1] = pAngleOverride[1];
 	}
-
-	mHmdAngles[0] += mHmdAVel[0];
-	mHmdAngles[1] += mHmdAVel[1];
 
 	mHmdAngles[0] = std::min<float>(std::max<float>(mHmdAngles[0], -skHmdMaxAngles[0]), skHmdMaxAngles[0]);
 	mHmdAngles[1] = fmodf(mHmdAngles[1], skHmdMaxAngles[1]);
@@ -262,6 +310,18 @@ void md::segavr_apply_hmd_movement()
 
 	//preserve L-R bits
 	mHmdEncoded = (mHmdEncoded & 0xC0000) | encode_hmd_angles(mHmdAngles);
+}
+
+void md::segavr_apply_hmd_movement()
+{
+	if (mHmdAVel[0] == 0.0f && mHmdAVel[1] == 0.0f)
+	{
+		return;
+	}
+
+	mHmdAngles[0] += mHmdAVel[0];
+	mHmdAngles[1] += mHmdAVel[1];
+	segavr_update_hmd_angles(NULL);
 }
 
 bool md::segavr_catch_io_write(uint32_t a, uint8_t d)

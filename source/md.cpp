@@ -312,6 +312,9 @@ int md::reset()
 #ifdef WITH_SEGAVR
 	segavr_init();
 #endif
+#ifdef WITH_OPENVR
+	openvr_init();
+#endif
   if (debug_log) fprintf (debug_log,"reset()\n");
 
     aoo3_toggle=aoo5_toggle=aoo3_six=aoo5_six
@@ -646,6 +649,10 @@ void md::init_pal()
 
 bool md::lock = false;
 
+#ifdef WITH_OPENVR
+SOVRInterface *md::spCurrentOVRI = NULL;
+#endif
+
 /**
  * MD constructor.
  * @param pal True if we are running the MD in PAL mode.
@@ -672,6 +679,9 @@ md::md(bool pal, char region):
 #endif
 #ifdef WITH_SEGAVR
 	mpEyeMap(NULL), mpLightnessTable(NULL), mpLightnessTableEntryCalculated(NULL),
+#endif
+#ifdef WITH_OPENVR
+	mOpenVRLib(0), mpOVRI(NULL),
 #endif
 	pal(pal), ok_ym2612(false), ok_sn76496(false),
 	vdp(*this), region(region), plugged(false), romCopy(NULL)
@@ -886,6 +896,10 @@ md::md(bool pal, char region):
 	segavr_init();
 #endif
 
+#ifdef WITH_OPENVR
+	openvr_init();
+#endif
+
   z80_init();
 
 #ifdef WITH_GXZ80
@@ -967,6 +981,10 @@ md::~md()
 
 #ifdef WITH_SEGAVR
 	segavr_cleanup();
+#endif
+
+#ifdef WITH_OPENVR
+	openvr_cleanup();
 #endif
 
 #ifdef WITH_NUKEDOPN2
