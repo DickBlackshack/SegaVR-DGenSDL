@@ -1987,6 +1987,13 @@ static void update_texture(struct texture& texture)
 				GL_BGRA, TEXTURE_32_TYPE,
 				texture.buf.u32);
 	glCallList(texture.dlist);
+#if WITH_OPENVR
+	//give the openvr implementation a chance to stomp over the screen if desired
+	if (dgen_openvr_draw_eyes && md::spCurrentOVRI)
+	{
+		md::spCurrentOVRI->OVR_DrawEyes(screen.window_width, screen.window_height);
+	}
+#endif
 	SDL_GL_SwapBuffers();
 }
 
@@ -3548,8 +3555,8 @@ static int screen_init(unsigned int width, unsigned int height)
 		// Force defaults once.
 		scrtmp.window_width = 0;
 		scrtmp.window_height = 0;
-		scrtmp.width = (video.width * 2);
-		scrtmp.height = ((video.height * 2) + info_height);
+		scrtmp.width = (dgen_window_width) ? dgen_window_width : (video.width * 2);
+		scrtmp.height = (dgen_window_height) ? dgen_window_height : ((video.height * 2) + info_height);
 		scrtmp.x_scale = (scrtmp.width / video.width);
 		scrtmp.y_scale = (scrtmp.height / video.height);
 		scrtmp.bpp = 0;

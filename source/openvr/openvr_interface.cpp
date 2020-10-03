@@ -34,6 +34,9 @@ namespace
 	float sAspectCrunch = 1.0f;
 	float sImagePerspectiveScale = 0.25f;
 
+	float sEyeOffsetX = 0.0f;
+	float sEyeOffsetY = 0.0f;
+
 	const GLenum skTextureSourceFormat = GL_BGRA_EXT;
 
 	float sPitchYaw[2] = { 0.0f, 0.0f };
@@ -115,10 +118,10 @@ namespace
 
 		glLoadMatrixf(projMat);
 
-		const float qLeft = -sImagePerspectiveScale;
-		const float qRight = sImagePerspectiveScale;
-		const float qTop = -sImagePerspectiveScale * sAspectCrunch;
-		const float qBottom = sImagePerspectiveScale * sAspectCrunch;
+		const float qLeft = sEyeOffsetX - sImagePerspectiveScale;
+		const float qRight = sEyeOffsetX + sImagePerspectiveScale;
+		const float qTop = sEyeOffsetY - sImagePerspectiveScale * sAspectCrunch;
+		const float qBottom = sEyeOffsetY + sImagePerspectiveScale * sAspectCrunch;
 
 		//i know no one wants you around anymore, immediate mode, but i still love you
 		glBegin(GL_QUADS);
@@ -270,6 +273,50 @@ void OVR_GetHMDPitchYaw(float *pAnglesOut)
 	pAnglesOut[1] = sPitchYaw[1];
 }
 
+void OVR_DrawEyes(const uint32_t windowWidth, const uint32_t windowHeight)
+{
+	//just stretch the eyes over the whole view
+	glPushAttrib(GL_VIEWPORT_BIT);
+	glViewport(0, 0, windowWidth, windowHeight);
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f);
+
+	glEnable(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, sLeftEyeTexture);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(0.5f, 0.0f, 0.0f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, 1.0f, 0.0f);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(0.0f, 1.0f, 0.0f);
+	glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, sLeftEyeTexture);
+	glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(0.5f, 0.0f, 0.0f);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(1.0f, 0.0f, 0.0f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(1.0f, 1.0f, 0.0f);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(0.5f, 1.0f, 0.0f);
+	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopAttrib();
+}
+
 void OVR_PostSwapBuffers()
 {
 	//sync here if necessary
@@ -280,7 +327,7 @@ void OVR_SetSimultaneousEyeUpdates(const bool enabled)
 	sSimultaneousEyeUpdates = enabled;
 }
 
-SOVRInterface *OpenVR_Interface_Init(const uint32_t eyeTargetWidth, const uint32_t eyeTargetHeight, const float idealAspect, const float imagePerspectiveScale)
+SOVRInterface *OpenVR_Interface_Init(const float eyeOffsetX, const float eyeOffsetY, const uint32_t eyeTargetWidth, const uint32_t eyeTargetHeight, const float idealAspect, const float imagePerspectiveScale)
 {
 	if (!assign_glext_function_pointers())
 	{
@@ -302,10 +349,13 @@ SOVRInterface *OpenVR_Interface_Init(const uint32_t eyeTargetWidth, const uint32
 	sEyeTargetWidth = (eyeTargetWidth > 0) ? eyeTargetWidth : rw;
 	sEyeTargetHeight = (eyeTargetHeight > 0) ? eyeTargetHeight : rh;
 
-	const float applyAspect = (idealAspect > 0.0f) ? idealAspect : 320.0f / 240.0f;
-	sAspectCrunch = ((float)sEyeTargetWidth / sEyeTargetHeight) / idealAspect;
+	const float displayAspect = ((float)sEyeTargetWidth * 2.0f) / sEyeTargetHeight;
+	sAspectCrunch = (idealAspect > 0.0f) ? idealAspect / displayAspect : 1.0f;
 
 	sImagePerspectiveScale = imagePerspectiveScale;
+
+	sEyeOffsetX = eyeOffsetX;
+	sEyeOffsetY = eyeOffsetY;
 
 	if (init_eye_fbo(sLeftEyeFBO, sLeftEyeTexture) != GL_FRAMEBUFFER_COMPLETE || init_eye_fbo(sRightEyeFBO, sRightEyeTexture) != GL_FRAMEBUFFER_COMPLETE)
 	{
@@ -320,6 +370,7 @@ SOVRInterface *OpenVR_Interface_Init(const uint32_t eyeTargetWidth, const uint32
 	sOvrInterface.OVR_GetPoses = OVR_GetPoses;
 	sOvrInterface.OVR_SubmitEyes = OVR_SubmitEyes;
 	sOvrInterface.OVR_GetHMDPitchYaw = OVR_GetHMDPitchYaw;
+	sOvrInterface.OVR_DrawEyes = OVR_DrawEyes;
 	sOvrInterface.OVR_PostSwapBuffers = OVR_PostSwapBuffers;
 	sOvrInterface.OVR_SetSimultaneousEyeUpdates = OVR_SetSimultaneousEyeUpdates;
 

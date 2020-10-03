@@ -172,6 +172,8 @@ RCVAR(dgen_h32_stretch, 0);
 #define YM_CHIPIMPL_DEFAULT 0
 #define YM_CHIPIMPL_NUKEDOPN2 1
 RCVAR(dgen_ym_chipimpl, YM_CHIPIMPL_DEFAULT);
+RCVAR(dgen_window_width, 0);
+RCVAR(dgen_window_height, 0);
 
 #ifdef WITH_SEGAVR
 RCVAR(dgen_segavr_enabled, 1);
@@ -209,10 +211,15 @@ RCVAR(dgen_openvr_enabled, 1);
 RCVAR(dgen_openvr_swapinterval, 0);
 RCVAR(dgen_openvr_eyewidth, 0);
 RCVAR(dgen_openvr_eyeheight, 0);
+RCVAR(dgen_openvr_eyex, 0);
+RCVAR(dgen_openvr_eyey, 0);
 RCVAR(dgen_openvr_imgpscale, 32768);
 RCVAR(dgen_openvr_idealaspect_width, 320);
 RCVAR(dgen_openvr_idealaspect_height, 240);
+RCVAR(dgen_openvr_yaw_offset, 0);
+RCVAR(dgen_openvr_pitch_offset, 0);
 RCVAR(dgen_openvr_eyes_sync, 1);
+RCVAR(dgen_openvr_draw_eyes, 0);
 #endif
 
 // Keep values in sync with rc.cpp and enums in md.h

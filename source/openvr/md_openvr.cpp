@@ -28,22 +28,23 @@ bool md::openvr_init()
 		return false;
 	}
 
-	SOVRInterface *(*pOpenVR_Interface_Init)(const uint32_t eyeTargetWidth, const uint32_t eyeTargetHeight, const float idealAspect, const float imagePerspectiveScale);
+	SOVRInterface *(*pOpenVR_Interface_Init)(const float eyeOffsetX, const float eyeOffsetY, const uint32_t eyeTargetWidth, const uint32_t eyeTargetHeight, const float idealAspect, const float imagePerspectiveScale);
 	*(uintptr_t *)&pOpenVR_Interface_Init = (uintptr_t)GetProcAddress(mOpenVRLib, "OpenVR_Interface_Init");
-	if (!pOpenVR_Interface_Init)
+	if (pOpenVR_Interface_Init)
 	{
-		openvr_cleanup();
-		return false;
+		const float idealAspect = (dgen_openvr_idealaspect_height > 0) ? (float)dgen_openvr_idealaspect_width / dgen_openvr_idealaspect_height : 0.0f;
+		const float imagePerspectiveScale = (float)dgen_openvr_imgpscale / 65536.0f;
+
+		mpOVRI = pOpenVR_Interface_Init(dgen_openvr_eyex / 65536.0f, dgen_openvr_eyey / 65536.0f, dgen_openvr_eyewidth, dgen_openvr_eyeheight, idealAspect, imagePerspectiveScale);
+		if (mpOVRI)
+		{
+			mpOVRI->OVR_SetSimultaneousEyeUpdates(dgen_openvr_eyes_sync != 0);
+			return true;
+		}
 	}
-	
-	const float idealAspect = (float)dgen_openvr_idealaspect_width / dgen_openvr_idealaspect_height;
-	const float imagePerspectiveScale = (float)dgen_openvr_imgpscale / 65536.0f;
 
-	mpOVRI = pOpenVR_Interface_Init(dgen_openvr_eyewidth, dgen_openvr_eyeheight, idealAspect, imagePerspectiveScale);
-
-	mpOVRI->OVR_SetSimultaneousEyeUpdates(dgen_openvr_eyes_sync != 0);
-
-	return true;
+	openvr_cleanup();
+	return false;
 }
 
 void md::openvr_cleanup()

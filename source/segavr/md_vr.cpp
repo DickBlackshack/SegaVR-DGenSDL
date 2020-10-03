@@ -187,6 +187,8 @@ bool md::segavr_steal_frame(bmap *pFrame)
 		//override the angles with the latest from the real headset
 		float pitchYaw[2];
 		mpOVRI->OVR_GetHMDPitchYaw(pitchYaw);
+		pitchYaw[0] += dgen_openvr_pitch_offset;
+		pitchYaw[1] += dgen_openvr_yaw_offset;
 		segavr_update_hmd_angles(pitchYaw);
 	}
 #endif
