@@ -40,6 +40,22 @@ bool md::openvr_init()
 		{
 			mpOVRI->OVR_SetSimultaneousEyeUpdates(dgen_openvr_eyes_sync != 0);
 			mpOVRI->OVR_SetBilinearFiltering(dgen_openvr_bilinear != 0);
+			if (dgen_openvr_lensfile.val && dgen_openvr_lensfile.val[0])
+			{
+				FILE *pLensFile = dgen_fopen("lenses", dgen_openvr_lensfile.val, DGEN_READ);
+				if (pLensFile)
+				{
+					fseek(pLensFile, 0, SEEK_END);
+					const uint32_t lensSize = ftell(pLensFile);
+					fseek(pLensFile, 0, SEEK_SET);
+
+					uint8_t *pLensData = (uint8_t *)malloc(lensSize);
+					fread(pLensData, 1, lensSize, pLensFile);
+					fclose(pLensFile);
+
+					mpOVRI->OVR_SetLensModel(pLensData, lensSize);
+				}
+			}
 			return true;
 		}
 	}

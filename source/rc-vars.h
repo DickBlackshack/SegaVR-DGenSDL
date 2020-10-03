@@ -221,6 +221,7 @@ RCVAR(dgen_openvr_pitch_offset, 0);
 RCVAR(dgen_openvr_eyes_sync, 1);
 RCVAR(dgen_openvr_bilinear, 0);
 RCVAR(dgen_openvr_draw_eyes, 0);
+RCSTR(dgen_openvr_lensfile, "");
 #endif
 
 // Keep values in sync with rc.cpp and enums in md.h

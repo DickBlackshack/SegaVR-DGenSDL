@@ -49,6 +49,21 @@ namespace
 	bool sSimultaneousEyeUpdates = true;
 	bool sBilinearFiltering = false;
 
+	struct SLensModelHeader
+	{
+		uint32_t mId;
+		uint32_t mVersion;
+		int32_t mVertexCount;
+		int32_t mIndexCount;
+	};
+	struct SLensModelVertex
+	{
+		//effectively unused component in each
+		float mPos[3];
+		float mUv[3];
+	};
+	SLensModelHeader *spLensModel = NULL;
+
 	vr::TrackedDevicePose_t sTrackedDevicePoses[vr::k_unMaxTrackedDeviceCount];
 
 	void init_eye_texture(GLuint &eyeTexture, const uint32_t width, const uint32_t height, const uint32_t sourceFormat)
@@ -120,22 +135,39 @@ namespace
 
 		glLoadMatrixf(projMat);
 
-		const float qLeft = sEyeOffsetX - sImagePerspectiveScale;
-		const float qRight = sEyeOffsetX + sImagePerspectiveScale;
-		const float qTop = sEyeOffsetY - sImagePerspectiveScale * sAspectCrunch;
-		const float qBottom = sEyeOffsetY + sImagePerspectiveScale * sAspectCrunch;
+		if (spLensModel)
+		{
+			const SLensModelVertex *pVerts = (const SLensModelVertex *)(spLensModel + 1);
+			const int32_t *pIndices = (const int32_t *)(pVerts + spLensModel->mVertexCount);
+			glBegin(GL_TRIANGLES);
+			for (uint32_t index = 0; index < spLensModel->mIndexCount; ++index)
+			{
+				const SLensModelVertex *pVert = pVerts + pIndices[index];
+				const float *pPos = pVert->mPos;
+				glTexCoord2fv(pVert->mUv);
+				glVertex3f(sEyeOffsetX + pPos[0] * sImagePerspectiveScale, sEyeOffsetY + pPos[1] * sImagePerspectiveScale * sAspectCrunch, pPos[2]);
+			}
+			glEnd();
+		}
+		else
+		{
+			const float qLeft = sEyeOffsetX - sImagePerspectiveScale;
+			const float qRight = sEyeOffsetX + sImagePerspectiveScale;
+			const float qTop = sEyeOffsetY - sImagePerspectiveScale * sAspectCrunch;
+			const float qBottom = sEyeOffsetY + sImagePerspectiveScale * sAspectCrunch;
 
-		//i know no one wants you around anymore, immediate mode, but i still love you
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(qLeft, qTop, 0.0f);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(qRight, qTop, 0.0f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(qRight, qBottom, 0.0f);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(qLeft, qBottom, 0.0f);
-		glEnd();
+			//i know no one wants you around anymore, immediate mode, but i still love you
+			glBegin(GL_QUADS);
+				glTexCoord2f(0.0f, 0.0f);
+				glVertex3f(qLeft, qTop, 0.0f);
+				glTexCoord2f(1.0f, 0.0f);
+				glVertex3f(qRight, qTop, 0.0f);
+				glTexCoord2f(1.0f, 1.0f);
+				glVertex3f(qRight, qBottom, 0.0f);
+				glTexCoord2f(0.0f, 1.0f);
+				glVertex3f(qLeft, qBottom, 0.0f);
+			glEnd();
+		}
 
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
@@ -190,6 +222,11 @@ void OVR_Shutdown()
 		free(pEyeTempBuffer);
 		pEyeTempBuffer = NULL;
 		glDeleteTextures(1, &sEyeTempTexture);
+	}
+	if (spLensModel)
+	{
+		free(spLensModel);
+		spLensModel = NULL;
 	}
 }
 
@@ -334,6 +371,15 @@ void OVR_SetBilinearFiltering(const bool enabled)
 	sBilinearFiltering = enabled;
 }
 
+void OVR_SetLensModel(const uint8_t *pLensData, const uint32_t dataSize)
+{
+	if (spLensModel)
+	{
+		free(spLensModel);
+	}
+	spLensModel = (SLensModelHeader *)pLensData;
+}
+
 SOVRInterface *OpenVR_Interface_Init(const float eyeOffsetX, const float eyeOffsetY, const uint32_t eyeTargetWidth, const uint32_t eyeTargetHeight, const float idealAspect, const float imagePerspectiveScale)
 {
 	if (!assign_glext_function_pointers())
@@ -381,6 +427,7 @@ SOVRInterface *OpenVR_Interface_Init(const float eyeOffsetX, const float eyeOffs
 	sOvrInterface.OVR_PostSwapBuffers = OVR_PostSwapBuffers;
 	sOvrInterface.OVR_SetSimultaneousEyeUpdates = OVR_SetSimultaneousEyeUpdates;
 	sOvrInterface.OVR_SetBilinearFiltering = OVR_SetBilinearFiltering;
+	sOvrInterface.OVR_SetLensModel = OVR_SetLensModel;
 
 	return &sOvrInterface;
 }

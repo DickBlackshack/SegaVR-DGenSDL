@@ -822,6 +822,7 @@ struct rc_field rc_fields[RC_FIELDS_SIZE] = {
 	{ "bool_openvr_eyes_sync", rc_boolean, &dgen_openvr_eyes_sync },
 	{ "bool_openvr_bilinear", rc_boolean, &dgen_openvr_bilinear },
 	{ "bool_openvr_draw_eyes", rc_boolean, &dgen_openvr_draw_eyes },
+	{ "str_openvr_lensfile", rc_string, (intptr_t *)((void *)&dgen_openvr_lensfile) },
 #endif
 	{ "bool_autoload", rc_boolean, &dgen_autoload },
 	{ "bool_autosave", rc_boolean, &dgen_autosave },
