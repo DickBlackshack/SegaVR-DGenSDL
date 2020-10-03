@@ -298,7 +298,7 @@ void OVR_DrawEyes(const uint32_t windowWidth, const uint32_t windowHeight)
 		glVertex3f(0.0f, 1.0f, 0.0f);
 	glEnd();
 
-	glBindTexture(GL_TEXTURE_2D, sLeftEyeTexture);
+	glBindTexture(GL_TEXTURE_2D, sRightEyeTexture);
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex3f(0.5f, 0.0f, 0.0f);
