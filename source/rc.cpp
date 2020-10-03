@@ -817,9 +817,10 @@ struct rc_field rc_fields[RC_FIELDS_SIZE] = {
 	{ "int_openvr_imgpscale", rc_number, &dgen_openvr_imgpscale },
 	{ "int_openvr_idealaspect_width", rc_number, &dgen_openvr_idealaspect_width },
 	{ "int_openvr_idealaspect_height", rc_number, &dgen_openvr_idealaspect_height },
-	{ "bool_openvr_eyes_sync", rc_boolean, &dgen_openvr_eyes_sync },
 	{ "int_openvr_yaw_offset", rc_number, &dgen_openvr_yaw_offset },
 	{ "int_openvr_pitch_offset", rc_number, &dgen_openvr_pitch_offset },
+	{ "bool_openvr_eyes_sync", rc_boolean, &dgen_openvr_eyes_sync },
+	{ "bool_openvr_bilinear", rc_boolean, &dgen_openvr_bilinear },
 	{ "bool_openvr_draw_eyes", rc_boolean, &dgen_openvr_draw_eyes },
 #endif
 	{ "bool_autoload", rc_boolean, &dgen_autoload },

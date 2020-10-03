@@ -39,6 +39,7 @@ bool md::openvr_init()
 		if (mpOVRI)
 		{
 			mpOVRI->OVR_SetSimultaneousEyeUpdates(dgen_openvr_eyes_sync != 0);
+			mpOVRI->OVR_SetBilinearFiltering(dgen_openvr_bilinear != 0);
 			return true;
 		}
 	}

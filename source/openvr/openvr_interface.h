@@ -18,6 +18,7 @@ struct SOVRInterface
 	void (*OVR_DrawEyes)(const uint32_t windowWidth, const uint32_t windowHeight);
 	void (*OVR_PostSwapBuffers)();
 	void (*OVR_SetSimultaneousEyeUpdates)(const bool enabled);
+	void (*OVR_SetBilinearFiltering)(const bool enabled);
 };
 
 OVR_API SOVRInterface *OpenVR_Interface_Init(const float eyeOffsetX, const float eyeOffsetY, const uint32_t eyeTargetWidth, const uint32_t eyeTargetHeight, const float idealAspect, const float imagePerspectiveScale);

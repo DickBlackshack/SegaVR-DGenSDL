@@ -219,6 +219,7 @@ RCVAR(dgen_openvr_idealaspect_height, 240);
 RCVAR(dgen_openvr_yaw_offset, 0);
 RCVAR(dgen_openvr_pitch_offset, 0);
 RCVAR(dgen_openvr_eyes_sync, 1);
+RCVAR(dgen_openvr_bilinear, 0);
 RCVAR(dgen_openvr_draw_eyes, 0);
 #endif
 

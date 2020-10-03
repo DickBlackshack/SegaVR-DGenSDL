@@ -47,17 +47,19 @@ namespace
 	const float skRadToDegf = (float)skRadToDeg;
 
 	bool sSimultaneousEyeUpdates = true;
+	bool sBilinearFiltering = false;
 
 	vr::TrackedDevicePose_t sTrackedDevicePoses[vr::k_unMaxTrackedDeviceCount];
 
 	void init_eye_texture(GLuint &eyeTexture, const uint32_t width, const uint32_t height, const uint32_t sourceFormat)
 	{
+		const GLint filterMode = (sBilinearFiltering) ? GL_LINEAR : GL_NEAREST;
 		glGenTextures(1, &eyeTexture);
 		glBindTexture(GL_TEXTURE_2D, eyeTexture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, sourceFormat, GL_UNSIGNED_BYTE, NULL);
 	}
 
@@ -327,6 +329,11 @@ void OVR_SetSimultaneousEyeUpdates(const bool enabled)
 	sSimultaneousEyeUpdates = enabled;
 }
 
+void OVR_SetBilinearFiltering(const bool enabled)
+{
+	sBilinearFiltering = enabled;
+}
+
 SOVRInterface *OpenVR_Interface_Init(const float eyeOffsetX, const float eyeOffsetY, const uint32_t eyeTargetWidth, const uint32_t eyeTargetHeight, const float idealAspect, const float imagePerspectiveScale)
 {
 	if (!assign_glext_function_pointers())
@@ -373,6 +380,7 @@ SOVRInterface *OpenVR_Interface_Init(const float eyeOffsetX, const float eyeOffs
 	sOvrInterface.OVR_DrawEyes = OVR_DrawEyes;
 	sOvrInterface.OVR_PostSwapBuffers = OVR_PostSwapBuffers;
 	sOvrInterface.OVR_SetSimultaneousEyeUpdates = OVR_SetSimultaneousEyeUpdates;
+	sOvrInterface.OVR_SetBilinearFiltering = OVR_SetBilinearFiltering;
 
 	return &sOvrInterface;
 }
