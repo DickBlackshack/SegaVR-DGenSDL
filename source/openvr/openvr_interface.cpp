@@ -60,9 +60,11 @@ namespace
 	{
 		//effectively unused component in each
 		float mPos[3];
-		float mUv[3];
+		float mUv[2];
 	};
 	SLensModelHeader *spLensModel = NULL;
+	GLuint sLensVBO = 0;
+	GLuint sLensIBO = 0;
 
 	vr::TrackedDevicePose_t sTrackedDevicePoses[vr::k_unMaxTrackedDeviceCount];
 
@@ -137,17 +139,27 @@ namespace
 
 		if (spLensModel)
 		{
-			const SLensModelVertex *pVerts = (const SLensModelVertex *)(spLensModel + 1);
-			const int32_t *pIndices = (const int32_t *)(pVerts + spLensModel->mVertexCount);
-			glBegin(GL_TRIANGLES);
-			for (uint32_t index = 0; index < spLensModel->mIndexCount; ++index)
-			{
-				const SLensModelVertex *pVert = pVerts + pIndices[index];
-				const float *pPos = pVert->mPos;
-				glTexCoord2fv(pVert->mUv);
-				glVertex3f(sEyeOffsetX + pPos[0] * sImagePerspectiveScale, sEyeOffsetY + pPos[1] * sImagePerspectiveScale * sAspectCrunch, pPos[2]);
-			}
-			glEnd();
+			assert(sLensIBO != 0 && sLensVBO != 0);
+			glMatrixMode(GL_MODELVIEW);
+			glTranslatef(sEyeOffsetX, sEyeOffsetY, 0.0f);
+			glScalef(sImagePerspectiveScale, sImagePerspectiveScale, 1.0f);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sLensIBO);
+			glBindBuffer(GL_ARRAY_BUFFER, sLensVBO);
+
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+			glVertexPointer(3, GL_FLOAT, sizeof(SLensModelVertex), (GLvoid *)offsetof(SLensModelVertex, mPos));
+			glTexCoordPointer(2, GL_FLOAT, sizeof(SLensModelVertex), (GLvoid *)offsetof(SLensModelVertex, mUv));
+
+			glDrawElements(GL_TRIANGLES, spLensModel->mIndexCount, GL_UNSIGNED_INT, 0);
+
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+			glLoadIdentity();
+			glMatrixMode(GL_PROJECTION);
 		}
 		else
 		{
@@ -194,6 +206,25 @@ namespace
 			pDstRow += dstStride;
 		}
 	}
+
+	void free_lens_model()
+	{
+		if (spLensModel)
+		{
+			free(spLensModel);
+			spLensModel = NULL;
+		}
+		if (sLensVBO)
+		{
+			glDeleteBuffers(1, &sLensVBO);
+			sLensVBO = 0;
+		}
+		if (sLensIBO)
+		{
+			glDeleteBuffers(1, &sLensIBO);
+			sLensIBO = 0;
+		}
+	}
 }
 
 #ifdef _DEBUG
@@ -223,11 +254,7 @@ void OVR_Shutdown()
 		pEyeTempBuffer = NULL;
 		glDeleteTextures(1, &sEyeTempTexture);
 	}
-	if (spLensModel)
-	{
-		free(spLensModel);
-		spLensModel = NULL;
-	}
+	free_lens_model();
 }
 
 bool OVR_ProvideEyeImage(const bool isLeft, const uint8_t *pData, const uint32_t bpp, const uint32_t width, const uint32_t height, const uint32_t stride)
@@ -373,11 +400,26 @@ void OVR_SetBilinearFiltering(const bool enabled)
 
 void OVR_SetLensModel(const uint8_t *pLensData, const uint32_t dataSize)
 {
-	if (spLensModel)
-	{
-		free(spLensModel);
-	}
+	free_lens_model();
 	spLensModel = (SLensModelHeader *)pLensData;
+	if (spLensModel && spHMD)
+	{
+		//create an ibo/vbo for the thing
+		glGenBuffers(1, &sLensIBO);
+		glGenBuffers(1, &sLensVBO);
+
+		const SLensModelVertex *pVerts = (const SLensModelVertex *)(spLensModel + 1);
+		const int32_t *pIndices = (const int32_t *)(pVerts + spLensModel->mVertexCount);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sLensIBO);
+		glBindBuffer(GL_ARRAY_BUFFER, sLensVBO);
+
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, spLensModel->mIndexCount * sizeof(int32_t), pIndices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, spLensModel->mVertexCount * sizeof(SLensModelVertex), pVerts, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 }
 
 SOVRInterface *OpenVR_Interface_Init(const float eyeOffsetX, const float eyeOffsetY, const uint32_t eyeTargetWidth, const uint32_t eyeTargetHeight, const float idealAspect, const float imagePerspectiveScale)

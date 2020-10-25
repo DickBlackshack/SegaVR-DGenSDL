@@ -53,6 +53,7 @@ bool md::openvr_init()
 					fread(pLensData, 1, lensSize, pLensFile);
 					fclose(pLensFile);
 
+					//the openvr implementation takes responsibility for the memory here
 					mpOVRI->OVR_SetLensModel(pLensData, lensSize);
 				}
 			}
@@ -66,14 +67,17 @@ bool md::openvr_init()
 
 void md::openvr_cleanup()
 {
+	if (mpOVRI)
+	{
+		mpOVRI->OVR_Shutdown();
+		mpOVRI = NULL;
+	}
+
 	if (mOpenVRLib)
 	{
-		assert(mpOVRI);
-		mpOVRI->OVR_Shutdown();
 		FreeLibrary(mOpenVRLib);
 		mOpenVRLib = 0;
 	}
-	mpOVRI = NULL;
 }
 
 void md::openvr_get_poses()
