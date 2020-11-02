@@ -49,7 +49,7 @@ bool md::openvr_init()
 					const uint32_t lensSize = ftell(pLensFile);
 					fseek(pLensFile, 0, SEEK_SET);
 
-					uint8_t *pLensData = (uint8_t *)malloc(lensSize);
+					uint8_t *pLensData = (uint8_t *)mpOVRI->OVR_MemAlloc(lensSize);
 					fread(pLensData, 1, lensSize, pLensFile);
 					fclose(pLensFile);
 

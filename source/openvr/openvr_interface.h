@@ -20,6 +20,8 @@ struct SOVRInterface
 	void (*OVR_SetSimultaneousEyeUpdates)(const bool enabled);
 	void (*OVR_SetBilinearFiltering)(const bool enabled);
 	void (*OVR_SetLensModel)(const uint8_t *pLensData, const uint32_t dataSize);
+	void *(*OVR_MemAlloc)(const uint32_t memSize);
+	void (*OVR_MemFree)(void *pMemPtr);
 };
 
 OVR_API SOVRInterface *OpenVR_Interface_Init(const float eyeOffsetX, const float eyeOffsetY, const uint32_t eyeTargetWidth, const uint32_t eyeTargetHeight, const float idealAspect, const float imagePerspectiveScale);

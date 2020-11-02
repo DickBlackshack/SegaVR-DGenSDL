@@ -12,6 +12,16 @@
 #define GLEXT_IMPL
 #include "openvr_interface_glext.h"
 
+void *OVR_MemAlloc(const uint32_t memSize)
+{
+	return malloc(memSize);
+}
+
+void OVR_MemFree(void *pMemPtr)
+{
+	free(pMemPtr);
+}
+
 namespace
 {
 	SOVRInterface sOvrInterface;
@@ -211,7 +221,7 @@ namespace
 	{
 		if (spLensModel)
 		{
-			free(spLensModel);
+			OVR_MemFree(spLensModel);
 			spLensModel = NULL;
 		}
 		if (sLensVBO)
@@ -250,7 +260,7 @@ void OVR_Shutdown()
 	}
 	if (pEyeTempBuffer)
 	{
-		free(pEyeTempBuffer);
+		OVR_MemFree(pEyeTempBuffer);
 		pEyeTempBuffer = NULL;
 		glDeleteTextures(1, &sEyeTempTexture);
 	}
@@ -269,10 +279,10 @@ bool OVR_ProvideEyeImage(const bool isLeft, const uint8_t *pData, const uint32_t
 	{
 		if (pEyeTempBuffer)
 		{
-			free(pEyeTempBuffer);
+			OVR_MemFree(pEyeTempBuffer);
 			glDeleteTextures(1, &sEyeTempTexture);
 		}
-		pEyeTempBuffer = (uint8_t *)malloc(width * height * 4);
+		pEyeTempBuffer = (uint8_t *)OVR_MemAlloc(width * height * 4);
 		init_eye_texture(sEyeTempTexture, width, height, skTextureSourceFormat);
 		sEyeTempWidth = width;
 		sEyeTempHeight = height;
