@@ -779,6 +779,7 @@ struct rc_field rc_fields[RC_FIELDS_SIZE] = {
 	{ "int_segavr_right_g", rc_number, &dgen_segavr_right_g },
 	{ "int_segavr_right_b", rc_number, &dgen_segavr_right_b },
 	{ "int_segavr_swapinterval", rc_number, &dgen_segavr_swapinterval },
+	{ "int_segavr_timeoutinterval", rc_number, &dgen_segavr_timeoutinterval },
 	{ "int_segavr_quadshot_count", rc_number, &dgen_segavr_quadshot_count },
 	{ "int_segavr_m68k_cyclediv", rc_number, &dgen_segavr_m68k_cyclediv },
 	{ "int_segavr_z80_cyclediv", rc_number, &dgen_segavr_z80_cyclediv },

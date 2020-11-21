@@ -188,6 +188,7 @@ RCVAR(dgen_segavr_right_r, 0);
 RCVAR(dgen_segavr_right_g, 255);
 RCVAR(dgen_segavr_right_b, 255);
 RCVAR(dgen_segavr_swapinterval, -1);
+RCVAR(dgen_segavr_timeoutinterval, 0);
 RCVAR(dgen_segavr_quadshot_count, 4);
 RCVAR(dgen_segavr_m68k_cyclediv, 0);
 RCVAR(dgen_segavr_z80_cyclediv, 0);

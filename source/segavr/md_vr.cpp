@@ -112,6 +112,10 @@ void md::segavr_register_vblank()
 
 	++mHmdVblankCounter;
 	mHmdVblankedOnLeft = (mHmdEncoded & 0x80000) != 0;
+	if (mHmdIsActive && dgen_segavr_timeoutinterval > 0 && mHmdVblankCounter >= dgen_segavr_timeoutinterval)
+	{
+		mHmdIsActive = 0;
+	}
 }
 
 void md::segavr_begin_scan()
@@ -345,6 +349,7 @@ bool md::segavr_catch_io_write(uint32_t a, uint8_t d)
 			mHmdRequestIndex = skHmdRequestIndex_Reset;
 			mHmdRequestBit = 0;
 			mHmdIsActive = 1; //consider a reset to mean the title expects us to be here
+			mHmdVblankCounter = 0;
 			mHmdAngles[0] = mHmdAngles[1] = 0.0f;
 			mHmdEncoded = 0;
 		}
