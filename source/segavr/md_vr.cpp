@@ -37,6 +37,12 @@ namespace
 		return enc;
 	}
 
+	INLINE uint32_t swap_hmd_eye_bits(const uint32_t encoded)
+	{
+		const uint32_t eyeBit = (encoded & 0x80000) ? 0x40000 : 0x80000;
+		return (encoded & 0x3FFFF) | eyeBit;
+	}
+
 #ifdef MONO_AS_LUMA
 	INLINE float bgr_to_mono_full_calculation(const uint8_t *pBgr)
 	{
@@ -82,6 +88,7 @@ void md::segavr_init()
 	mHmdIsActive = 0;
 	mHmdVblankCounter = 0;
 	mHmdVblankedOnLeft = mHmdScannedOnLeft = false;
+	mHmdJustReset = false;
 	mHmdAngles[0] = mHmdAngles[1] = mHmdAVel[0] = mHmdAVel[1] = 0.0f;
 	mHmdEncoded = 0;
 	mStereoShotCount = 0;
@@ -359,6 +366,15 @@ bool md::segavr_catch_io_write(uint32_t a, uint8_t d)
 			{
 				mHmdRequestBit = (d & 0x20);
 				mHmdRequestIndex = (mHmdRequestIndex + 1) % 5;
+				if (mHmdRequestIndex == skHmdRequestIndex_ID0)
+				{
+					//skip the id if we haven't freshly reset, IH is doing idles after every data grab
+					if (!mHmdJustReset)
+					{
+						mHmdRequestIndex = 0;
+					}
+					mHmdJustReset = false;
+				}
 			}
 		}
 		return true;
@@ -388,7 +404,8 @@ bool md::segavr_catch_io_read(uint8_t &valueOut, uint32_t a)
 		switch (mHmdRequestIndex)
 		{
 		case skHmdRequestIndex_Reset:
-			valueOut = 0;
+			valueOut = skHMDReset; //IH compares against $40, while other driver versions only care about whether $10 is set
+			mHmdJustReset = true;
 			break;
 		case skHmdRequestIndex_Idle:
 			valueOut = 0x10 | skHmdAckResponse;
@@ -404,8 +421,7 @@ bool md::segavr_catch_io_read(uint8_t &valueOut, uint32_t a)
 			{
 				//toggle which eye we'll be rendering on the next vblank
 				//if vblank count is odd, should we keep the eye bit because it indicates a missed frame? can't say, since we don't have the hardware or more games to test with
-				const uint32_t eyeBit = (mHmdEncoded & 0x80000) ? 0x40000 : 0x80000;
-				mHmdEncoded = (mHmdEncoded & 0x3FFFF) | eyeBit;
+				mHmdEncoded = swap_hmd_eye_bits(mHmdEncoded);
 				mHmdVblankCounter = 0;
 			}
 			//fall through

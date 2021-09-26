@@ -855,6 +855,7 @@ public:
   int32_t mHmdVblankCounter;
   bool mHmdVblankedOnLeft;
   bool mHmdScannedOnLeft;
+  bool mHmdJustReset;
   int32_t mStereoShotCount;
   bool mStereoShotKickoff;
   bmap *mpEyeMap;
