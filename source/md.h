@@ -67,6 +67,29 @@ extern "C" {
 #include "sn76496.h"
 #include "system.h"
 
+#include <cmath>
+
+template<uint32_t v>
+struct const_log2 { static const uint32_t v = 1 + const_log2<v / 2>::v; };
+template<>
+struct const_log2<0> {};
+template<>
+struct const_log2<1> { static const uint32_t v = 0; };
+template<uint32_t a, uint32_t b>
+struct const_sub_abs { static const uint32_t v = (a > b) ? a - b : b - a; };
+template<uint32_t a, uint32_t b>
+struct const_bit_delta { static const uint32_t v = const_sub_abs< const_log2<a>::v, const_log2<b>::v >::v; };
+STATICINLINE constexpr uint32_t const_replace_bit(const uint32_t v, const uint32_t a, const uint32_t b) { return (v & ~a) | b; }
+//here's a ridiculous way of getting the compiler to ultimately generate shr/shl, not, and, or!
+template<uint32_t toBit, uint32_t fromBit>
+STATICINLINE uint32_t transfer_bit(const uint32_t to, const uint32_t from)
+{
+	const uint32_t fromV = (from & fromBit);
+	const uint32_t bitDelta = const_bit_delta<fromBit, toBit>::v;
+	const uint32_t shifted = (fromBit > toBit) ? (fromV >> bitDelta) : (fromV << bitDelta);
+	return const_replace_bit(to, toBit, shifted);
+}
+
 // Debugging macros and support functions. They look like this because C++98
 // lacks support for variadic macros. Not my fault.
 #ifndef NDEBUG
@@ -844,20 +867,17 @@ public:
   void segavr_apply_hmd_movement();
   bool segavr_catch_io_write(uint32_t a, uint8_t d);
   bool segavr_catch_io_read(uint8_t &valueOut, uint32_t a);
+  void segavr_headsmack();
   float bgr_to_mono(const uint8_t *pBgr);
   int32_t mHmdThRwMask;
   int32_t mHmdRequestBit;
   int32_t mHmdRequestIndex;
-  int32_t mHmdIsActive;
   float mHmdAngles[2];
   float mHmdAVel[2];
   uint32_t mHmdEncoded;
   int32_t mHmdVblankCounter;
-  bool mHmdVblankedOnLeft;
-  bool mHmdScannedOnLeft;
-  bool mHmdJustReset;
+  uint32_t mHmdFlags;
   int32_t mStereoShotCount;
-  bool mStereoShotKickoff;
   bmap *mpEyeMap;
   float *mpLightnessTable;
   bool *mpLightnessTableEntryCalculated;

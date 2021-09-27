@@ -771,6 +771,7 @@ struct rc_field rc_fields[RC_FIELDS_SIZE] = {
 	{ "bool_segavr_swapeyeframes", rc_boolean, &dgen_segavr_swapeyeframes },
 	{ "int_segavr_eyeswapinterval", rc_number, &dgen_segavr_eyeswapinterval },
 	{ "bool_segavr_flipbetweenpolls", rc_boolean, &dgen_segavr_flipbetweenpolls },
+	{ "bool_segavr_flipinvblank", rc_boolean, &dgen_segavr_flipinvblank },
 	{ "int_segavr_displaymode", rc_number, &dgen_segavr_displaymode },
 	{ "int_segavr_left_r", rc_number, &dgen_segavr_left_r },
 	{ "int_segavr_left_g", rc_number, &dgen_segavr_left_g },
@@ -807,6 +808,9 @@ struct rc_field rc_fields[RC_FIELDS_SIZE] = {
 	{ "key_hmd_quadshot", rc_keysym, &segavr_hmd_quadshot[RCBK] },
 	{ "joy_hmd_quadshot", rc_joypad, &segavr_hmd_quadshot[RCBJ] },
 	{ "mou_hmd_quadshot", rc_mouse, &segavr_hmd_quadshot[RCBM] },
+	{ "key_hmd_headsmack", rc_keysym, &segavr_hmd_headsmack[RCBK] },
+	{ "joy_hmd_headsmack", rc_joypad, &segavr_hmd_headsmack[RCBJ] },
+	{ "mou_hmd_headsmack", rc_mouse, &segavr_hmd_headsmack[RCBM] },
 #endif
 #ifdef WITH_OPENVR
 	{ "bool_openvr_enabled", rc_boolean, &dgen_openvr_enabled },

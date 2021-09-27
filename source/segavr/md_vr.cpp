@@ -28,6 +28,16 @@ namespace
 
 	const float skHmdMaxAngles[2] = { 30.0f, 360.0f };
 
+	const uint32_t skHmdFlag_IsActive = (1 << 0);
+	const uint32_t skHmdFlag_VBlankedOnLeft = (1 << 1);
+	const uint32_t skHmdFlag_ScannedOnLeft = (1 << 2);
+	const uint32_t skHmdFlag_StereoShotKickoff = (1 << 3);
+	const uint32_t skHmdFlag_JustReset = (1 << 4);
+	const uint32_t skHmdFlag_SwapEyes = (1 << 5);
+
+	const uint32_t skHmdEye_Left = 0x80000;
+	const uint32_t skHmdEye_Right = 0x40000;
+
 	INLINE uint32_t encode_hmd_angles(const float *pAngles)
 	{
 		//assumes angles have already been clamped
@@ -39,7 +49,7 @@ namespace
 
 	INLINE uint32_t swap_hmd_eye_bits(const uint32_t encoded)
 	{
-		const uint32_t eyeBit = (encoded & 0x80000) ? 0x40000 : 0x80000;
+		const uint32_t eyeBit = (encoded & skHmdEye_Left) ? skHmdEye_Right : skHmdEye_Left;
 		return (encoded & 0x3FFFF) | eyeBit;
 	}
 
@@ -85,14 +95,11 @@ void md::segavr_init()
 	mHmdThRwMask = 0;
 	mHmdRequestBit = 0;
 	mHmdRequestIndex = 0;
-	mHmdIsActive = 0;
 	mHmdVblankCounter = 0;
-	mHmdVblankedOnLeft = mHmdScannedOnLeft = false;
-	mHmdJustReset = false;
+	mHmdFlags = 0;
 	mHmdAngles[0] = mHmdAngles[1] = mHmdAVel[0] = mHmdAVel[1] = 0.0f;
 	mHmdEncoded = 0;
 	mStereoShotCount = 0;
-	mStereoShotKickoff = false;
 }
 
 void md::segavr_cleanup()
@@ -117,18 +124,33 @@ void md::segavr_register_vblank()
 		return;
 	}
 
-	++mHmdVblankCounter;
-	mHmdVblankedOnLeft = (mHmdEncoded & 0x80000) != 0;
-	if (mHmdIsActive && dgen_segavr_timeoutinterval > 0 && mHmdVblankCounter >= dgen_segavr_timeoutinterval)
+	if (mHmdFlags & skHmdFlag_SwapEyes)
 	{
-		mHmdIsActive = 0;
+		mHmdEncoded = swap_hmd_eye_bits(mHmdEncoded);
+		mHmdFlags &= ~skHmdFlag_SwapEyes;
+	}
+
+	++mHmdVblankCounter;
+
+	mHmdFlags = transfer_bit<skHmdFlag_VBlankedOnLeft, skHmdEye_Left>(mHmdFlags, mHmdEncoded);
+	if (mHmdFlags & skHmdFlag_IsActive)
+	{
+		if (dgen_segavr_timeoutinterval > 0 && mHmdVblankCounter >= dgen_segavr_timeoutinterval)
+		{
+			mHmdFlags &= ~skHmdFlag_IsActive;
+		}
+		else if (dgen_segavr_flipinvblank && mHmdVblankCounter >= dgen_segavr_eyeswapinterval)
+		{
+			mHmdEncoded = swap_hmd_eye_bits(mHmdEncoded);
+			mHmdVblankCounter = 0;
+		}
 	}
 }
 
 void md::segavr_begin_scan()
 {
 	//store the last eye we vblanked on as the one we're about to scan out
-	mHmdScannedOnLeft = mHmdVblankedOnLeft;
+	mHmdFlags = transfer_bit<skHmdFlag_ScannedOnLeft, skHmdFlag_VBlankedOnLeft>(mHmdFlags, mHmdFlags);
 }
 
 bool md::segavr_allow_frameskip()
@@ -141,7 +163,7 @@ bool md::segavr_allow_frameskip()
 #endif
 
 	//don't allow frameskip when active, we're tracking and combing frames
-	return !mHmdIsActive;
+	return !(mHmdFlags & skHmdFlag_IsActive);
 }
 
 bool md::segavr_steal_frame(bmap *pFrame)
@@ -159,7 +181,9 @@ bool md::segavr_steal_frame(bmap *pFrame)
 		return false;
 	}
 
-	bool isLeft = (!dgen_segavr_swapeyeframes) ? mHmdScannedOnLeft : !mHmdScannedOnLeft;
+	const bool isActive = (mHmdFlags & skHmdFlag_IsActive) != 0;
+	const bool scannedOnLeft = (mHmdFlags & skHmdFlag_ScannedOnLeft) != 0;
+	bool isLeft = (!dgen_segavr_swapeyeframes) ? scannedOnLeft : !scannedOnLeft;
 	if (dgen_segavr_flipbetweenpolls && (mHmdVblankCounter & 1))
 	{ //continue alternating in between hmd polls
 		isLeft = !isLeft;
@@ -167,12 +191,12 @@ bool md::segavr_steal_frame(bmap *pFrame)
 
 	if (mStereoShotCount > 0)
 	{
-		if (!mStereoShotKickoff)
-		{ //want to make sure we kick off on the first frame of the left eye
-			mStereoShotKickoff = (isLeft && mHmdVblankCounter == 0);
+		if (!(mHmdFlags & skHmdFlag_StereoShotKickoff) && isLeft)
+		{ //want to make sure we kick off on the left eye
+			mHmdFlags |= skHmdFlag_StereoShotKickoff;
 		}
 
-		if (mStereoShotKickoff)
+		if (mHmdFlags & skHmdFlag_StereoShotKickoff)
 		{
 			const intptr_t preserveSetting = dgen_raw_screenshots;
 			dgen_raw_screenshots = 1;
@@ -180,7 +204,7 @@ bool md::segavr_steal_frame(bmap *pFrame)
 			dgen_raw_screenshots = preserveSetting;
 			if (!--mStereoShotCount)
 			{
-				mStereoShotKickoff = false;
+				mHmdFlags &= ~skHmdFlag_StereoShotKickoff;
 			}
 		}
 	}
@@ -189,7 +213,7 @@ bool md::segavr_steal_frame(bmap *pFrame)
 	if (mpOVRI)
 	{
 		ovri_update_eye_image(mpOVRI, isLeft, pFrame);
-		if (!mHmdIsActive)
+		if (!isActive)
 		{
 			//provide the same image for the other eye if the HMD isn't active
 			ovri_update_eye_image(mpOVRI, !isLeft, pFrame);
@@ -205,7 +229,7 @@ bool md::segavr_steal_frame(bmap *pFrame)
 #endif
 
 	//only support processing raw rgb(a)
-	const bool frameStealingEnabled = (mHmdIsActive && pFrame->bpp >= 24 && dgen_segavr_displaymode);
+	const bool frameStealingEnabled = (isActive && pFrame->bpp >= 24 && dgen_segavr_displaymode);
 
 #ifdef WITH_OPENVR
 	const int32_t desiredSwapValue = (mpOVRI) ? dgen_openvr_swapinterval : dgen_segavr_swapinterval;
@@ -355,10 +379,10 @@ bool md::segavr_catch_io_write(uint32_t a, uint8_t d)
 		{
 			mHmdRequestIndex = skHmdRequestIndex_Reset;
 			mHmdRequestBit = 0;
-			mHmdIsActive = 1; //consider a reset to mean the title expects us to be here
+			mHmdFlags |= skHmdFlag_IsActive; //consider a reset to mean the title expects us to be here
 			mHmdVblankCounter = 0;
 			mHmdAngles[0] = mHmdAngles[1] = 0.0f;
-			mHmdEncoded = 0;
+			mHmdEncoded = skHmdEye_Left; //resetting to the left eye just to be reliable for those early builds with no eye-tracker synchronization
 		}
 		else
 		{
@@ -369,11 +393,11 @@ bool md::segavr_catch_io_write(uint32_t a, uint8_t d)
 				if (mHmdRequestIndex == skHmdRequestIndex_ID0)
 				{
 					//skip the id if we haven't freshly reset, IH is doing idles after every data grab
-					if (!mHmdJustReset)
+					if (!(mHmdFlags & skHmdFlag_JustReset))
 					{
 						mHmdRequestIndex = 0;
 					}
-					mHmdJustReset = false;
+					mHmdFlags &= ~skHmdFlag_JustReset;
 				}
 			}
 		}
@@ -405,7 +429,9 @@ bool md::segavr_catch_io_read(uint8_t &valueOut, uint32_t a)
 		{
 		case skHmdRequestIndex_Reset:
 			valueOut = skHMDReset; //IH compares against $40, while other driver versions only care about whether $10 is set
-			mHmdJustReset = true;
+			mHmdFlags |= skHmdFlag_JustReset;
+			//quick hack test for NR prototype
+			//misc_writebyte(0xFFBF24, 0xFF);
 			break;
 		case skHmdRequestIndex_Idle:
 			valueOut = 0x10 | skHmdAckResponse;
@@ -417,7 +443,7 @@ bool md::segavr_catch_io_read(uint8_t &valueOut, uint32_t a)
 			valueOut = 0x10 | skHmdID_1;
 			break;
 		case 0: //update the l-r bits on read
-			if (mHmdVblankCounter >= dgen_segavr_eyeswapinterval)
+			if (!dgen_segavr_flipinvblank && mHmdVblankCounter >= dgen_segavr_eyeswapinterval)
 			{
 				//toggle which eye we'll be rendering on the next vblank
 				//if vblank count is odd, should we keep the eye bit because it indicates a missed frame? can't say, since we don't have the hardware or more games to test with
@@ -434,6 +460,11 @@ bool md::segavr_catch_io_read(uint8_t &valueOut, uint32_t a)
 	}
 
 	return false;
+}
+
+void md::segavr_headsmack()
+{
+	mHmdFlags |= skHmdFlag_SwapEyes;
 }
 
 float md::bgr_to_mono(const uint8_t *pBgr)

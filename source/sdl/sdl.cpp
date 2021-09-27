@@ -5322,6 +5322,7 @@ enum ctl_e {
 	CTL_SEGAVR_HMD_YAW_LEFT,
 	CTL_SEGAVR_HMD_YAW_RIGHT,
 	CTL_SEGAVR_HMD_QUADSHOT,
+	CTL_SEGAVR_HMD_HEADSMACK,
 #endif
 	CTL_
 };
@@ -5848,6 +5849,12 @@ static int ctl_hmd_quadshot(struct ctl&, md& megad)
 	megad.mStereoShotCount = dgen_segavr_quadshot_count;
 	return 1;
 }
+
+static int ctl_hmd_headsmack(struct ctl&, md& megad)
+{
+	megad.segavr_headsmack();
+	return 1;
+}
 #endif
 
 static int ctl_dgen_debug_enter(struct ctl&, md& megad)
@@ -5949,6 +5956,7 @@ static struct ctl control[] = {
 	{ CTL_SEGAVR_HMD_YAW_LEFT, &segavr_hmd_yaw_left, ctl_hmd, ctl_hmd_release, DEF },
 	{ CTL_SEGAVR_HMD_YAW_RIGHT, &segavr_hmd_yaw_right, ctl_hmd, ctl_hmd_release, DEF },
 	{ CTL_SEGAVR_HMD_QUADSHOT, &segavr_hmd_quadshot, ctl_hmd_quadshot, NULL, DEF },
+	{ CTL_SEGAVR_HMD_HEADSMACK, &segavr_hmd_headsmack, ctl_hmd_headsmack, NULL, DEF },
 #endif
 	{ CTL_, NULL, NULL, NULL, DEF }
 };

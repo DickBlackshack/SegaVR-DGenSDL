@@ -180,6 +180,7 @@ RCVAR(dgen_segavr_enabled, 1);
 RCVAR(dgen_segavr_swapeyeframes, 0);
 RCVAR(dgen_segavr_eyeswapinterval, 1);
 RCVAR(dgen_segavr_flipbetweenpolls, 0);
+RCVAR(dgen_segavr_flipinvblank, 0);
 RCVAR(dgen_segavr_displaymode, 1);
 RCVAR(dgen_segavr_left_r, 255);
 RCVAR(dgen_segavr_left_g, 0);
@@ -206,6 +207,7 @@ RCCTL(segavr_hmd_pitch_down, ',', JS_AXIS(0, 3, JS_AXIS_POSITIVE), 0);
 RCCTL(segavr_hmd_yaw_left, ',', JS_AXIS(0, 4, JS_AXIS_NEGATIVE), 0);
 RCCTL(segavr_hmd_yaw_right, ',', JS_AXIS(0, 4, JS_AXIS_POSITIVE), 0);
 RCCTL(segavr_hmd_quadshot, PDK_F4, 0, 0);
+RCCTL(segavr_hmd_headsmack, PDK_F8, 0, 0);
 #endif
 #ifdef WITH_OPENVR
 RCVAR(dgen_openvr_enabled, 1);
